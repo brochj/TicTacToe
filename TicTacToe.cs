@@ -38,7 +38,7 @@ namespace TicTacToe
             if (IsHorizontalWin() || IsVerticalWin() || IsDiagonalWin())
             {
                 endGame = true;
-                Console.WriteLine($"Fim de Jogo!! Vitória de {turn}");
+                Console.WriteLine($"Fim de Jogo!! Vitória de '{turn}'");
                 return;
             }
 
