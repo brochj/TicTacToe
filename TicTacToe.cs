@@ -1,3 +1,7 @@
+using TicTacToe.Config;
+using TicTacToe.RenderContext;
+using TicTacToe.GameContext;
+
 namespace TicTacToe
 {
     class TicTacToeCore
@@ -6,12 +10,14 @@ namespace TicTacToe
         private char[] positions;
         private char turn;
         private int filledSpaces;
-        public TicTacToeCore()
+        private Victory victory;
+        public TicTacToeCore(Victory win)
         {
             endGame = false;
             positions = new[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-            turn = 'x';
+            turn = Symbol.X;
             filledSpaces = 0;
+            victory = win;
         }
 
         public void Start()
@@ -25,20 +31,28 @@ namespace TicTacToe
                 ChangeTurn();
             }
         }
-
+        private void RenderTable()
+        {
+            Console.Clear();
+            Render.Table(positions);
+        }
         private void ChangeTurn()
         {
-            turn = turn == 'x' ? 'o' : 'x';
+            turn = turn == Symbol.X ? Symbol.O : Symbol.X;
         }
-
         private void VerifyEndGame()
         {
+
             if (filledSpaces < 5)
                 return;
-            if (IsHorizontalWin() || IsVerticalWin() || IsDiagonalWin())
+
+
+            if (IsVictory())
             {
                 endGame = true;
+
                 Console.WriteLine($"Fim de Jogo!! Vitória de '{turn}'");
+                Console.WriteLine($"Tipo da Vitória {victory.Type}");
                 return;
             }
 
@@ -49,32 +63,10 @@ namespace TicTacToe
                 return;
             }
         }
-
-        private bool IsHorizontalWin()
+        private bool IsVictory()
         {
-            bool line1 = AreThePositionsTheSame(0, 1, 2);
-            bool line2 = AreThePositionsTheSame(3, 4, 5);
-            bool line3 = AreThePositionsTheSame(6, 7, 8);
-            return line1 || line2 || line3;
+            return victory.IsVictory(positions);
         }
-        private bool IsVerticalWin()
-        {
-            bool column1 = AreThePositionsTheSame(0, 3, 6);
-            bool column2 = AreThePositionsTheSame(1, 4, 7);
-            bool column3 = AreThePositionsTheSame(2, 5, 8);
-            return column1 || column2 || column3;
-        }
-        private bool IsDiagonalWin()
-        {
-            bool diagonal1 = AreThePositionsTheSame(0, 4, 8);
-            bool diagonal2 = AreThePositionsTheSame(2, 4, 6);
-            return diagonal1 || diagonal2;
-        }
-        private bool AreThePositionsTheSame(int pos1, int pos2, int pos3)
-        {
-            return positions[pos1] == positions[pos2] && positions[pos1] == positions[pos3];
-        }
-
         private void ReadUserChoice()
         {
             Console.WriteLine($"Agora é a vez do '{turn}', digite uma posição de 1 a 9 que esteja disponível");
@@ -90,7 +82,16 @@ namespace TicTacToe
 
             FillTheBlank(positionChoosed);
         }
-
+        private bool isUserChoiceValid(int positionChoosed)
+        {
+            return (IsBetweenOneAndNine(positionChoosed) && IsThePositionFilled(positionChoosed));
+        }
+        private bool IsThePositionFilled(int pos)
+        {
+            int index = pos - 1;
+            return positions[index] != Symbol.O && positions[index] != Symbol.X;
+        }
+        private bool IsBetweenOneAndNine(int number) => number > 0 && number < 10;
         private void FillTheBlank(int positionChoosed)
         {
             int index = positionChoosed - 1;
@@ -98,28 +99,5 @@ namespace TicTacToe
             positions[index] = turn;
             filledSpaces++;
         }
-
-        private bool isUserChoiceValid(int positionChoosed)
-        {
-            int index = positionChoosed - 1;
-
-
-            return (positionChoosed < 10 && positionChoosed > 0 && positions[index] != 'o' && positions[index] != 'x');
-        }
-
-        private void RenderTable()
-        {
-            Console.Clear();
-            Console.WriteLine(GetTable());
-
-        }
-
-        private string GetTable()
-        {
-            return $"__{positions[0]}__|__{positions[1]}__|__{positions[2]}__\n" +
-                   $"__{positions[3]}__|__{positions[4]}__|__{positions[5]}__\n" +
-                   $"  {positions[6]}  |  {positions[7]}  |  {positions[8]}  \n";
-        }
-
     }
 }

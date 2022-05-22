@@ -1,6 +1,11 @@
 ﻿using TicTacToe;
+using TicTacToe.GameContext;
 
-var game = new TicTacToeCore();
-Console.WriteLine("Tic Tac Toe");
+
+
+var victory = new Victory();
+var game = new TicTacToeCore(victory);
+
+
 
 game.Start();
